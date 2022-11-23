@@ -60,8 +60,8 @@ for encoding in encodings:
             # select first entry in the dictionary)
             name = max(counts, key=counts.get)
 
-        # update the list of names
-        names.append(name)
+    # update the list of names
+    names.append(name)
 
 # loop over the recognized faces
 for ((top, right, bottom, left), name) in zip(boxes, names):
