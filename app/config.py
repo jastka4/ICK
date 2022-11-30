@@ -31,6 +31,10 @@ class TestingConfig(BaseConfig):
 
 class ProductionConfig(BaseConfig):
     """Production configuration."""
-    SECRET_KEY = 'my_secret'
-    DEBUG = False
-    SQLALCHEMY_DATABASE_URI = 'mysql:///example'
+    SQLALCHEMY_DATABASE_URI = (
+        'postgresql://{nam}:{pas}@localhost/{dbn}?host=/cloudsql/{con}').format(
+        nam=os.getenv('DATABASE_USER'),
+        pas=os.getenv('DATABASE_PASSWORD'),
+        dbn=os.getenv('DATABASE_NAME'),
+        con=os.getenv('DATABASE_CONNECTION'),
+    )

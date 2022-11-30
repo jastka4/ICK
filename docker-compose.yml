@@ -1,0 +1,22 @@
+version: '3.1'
+services:
+  app:
+    build: .
+    container_name: face_recognition
+    environment:
+      - APP_SETTINGS=app.config.DevelopmentConfig
+    ports:
+      - "5050:5000"
+    volumes:
+      - .:/code
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: face_recognition
+    ports:
+      - "5432:5432"
