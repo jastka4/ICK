@@ -2,8 +2,7 @@
 FROM python:3.9
 
 RUN apt-get update
-RUN apt-get -y install libglib2.0-0 \
-    libsm6 libxrender-dev libxext6
+RUN apt-get install ffmpeg libsm6 libxext6 -y
 
 ADD ./ /code/
 WORKDIR /code

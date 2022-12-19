@@ -1,8 +1,16 @@
-import jwt
 import datetime
 
-from ..extensions import db, bcrypt
+import jwt
 from flask import current_app
+from sqlalchemy.sql.type_api import UserDefinedType
+
+from ..extensions import db, bcrypt
+from ..recognition import encode
+
+
+class CUBE(UserDefinedType):
+    def get_col_spec(self, **kw):
+        return "CUBE"
 
 
 class User(db.Model):
@@ -13,15 +21,38 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False)
+    face_embeddings_low = db.Column(CUBE, unique=True, nullable=False)
+    face_embeddings_high = db.Column(CUBE, unique=True, nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
 
-    def __init__(self, email, password, admin=False):
+    def __init__(self, email, password, image, admin=False):
         self.email = email
         self.password = bcrypt.generate_password_hash(
             password, current_app.config.get('BCRYPT_LOG_ROUNDS')
         ).decode()
+
+        face_embeddings = encode(image)
+        self.face_embeddings_low = ','.join(str(s) for s in face_embeddings[0][0:64])
+        self.face_embeddings_high = ','.join(str(s) for s in face_embeddings[0][64:128])
+
         self.registered_on = datetime.datetime.now()
         self.admin = admin
+
+    @staticmethod
+    def get_user(image):
+        threshold = 0.6
+        face_embeddings = encode(image)
+
+        query = "SELECT * FROM users WHERE sqrt(power(CUBE(array[{}]) <-> face_embeddings_low, 2) + power(CUBE(array[{}]) <-> face_embeddings_high, 2)) <= {} ".format(
+            ','.join(str(s) for s in face_embeddings[0][0:64]),
+            ','.join(str(s) for s in face_embeddings[0][64:128]),
+            threshold,
+        ) + "ORDER BY sqrt(power(CUBE(array[{}]) <-> face_embeddings_low, 2) + power(CUBE(array[{}]) <-> face_embeddings_high, 2)) ASC".format(
+            ','.join(str(s) for s in face_embeddings[0][0:64]),
+            ','.join(str(s) for s in face_embeddings[0][64:128]),
+        )
+
+        return User.query.from_statement(db.text(query)).first()
 
     def encode_auth_token(self, user_id):
         """
