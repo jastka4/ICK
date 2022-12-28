@@ -11,13 +11,14 @@ from .extensions import (
 
 # blueprints
 from .auth import auth
+from .settings import settings
 
 # commands
 from .commands import create_db, drop_db
 
 __all__ = ("create_app",)
 
-BLUEPRINTS = (auth,)
+BLUEPRINTS = (auth, settings)
 COMMANDS = (create_db, drop_db)
 
 

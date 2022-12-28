@@ -127,53 +127,6 @@ class LoginAPI(MethodView):
             return make_response(jsonify(response_object)), 500
 
 
-class UserAPI(MethodView):
-    """
-    User Resource
-    """
-
-    @staticmethod
-    def get():
-        # get the auth token
-        auth_header = request.headers.get('Authorization')
-        if auth_header:
-            try:
-                auth_token = auth_header.split(" ")[1]
-            except IndexError:
-                response_object = {
-                    'status': 'fail',
-                    'message': 'Bearer token malformed.'
-                }
-                return make_response(jsonify(response_object)), 401
-        else:
-            auth_token = ''
-        if auth_token:
-            resp = User.decode_auth_token(auth_token)
-            if not isinstance(resp, str):
-                user = User.query.filter_by(id=resp).first()
-                response_object = {
-                    'status': 'success',
-                    'data': {
-                        'user_id': user.id,
-                        'email': user.email,
-                        'admin': user.admin,
-                        'registered_on': user.registered_on
-                    }
-                }
-                return make_response(jsonify(response_object)), 200
-            response_object = {
-                'status': 'fail',
-                'message': resp
-            }
-            return make_response(jsonify(response_object)), 401
-        else:
-            response_object = {
-                'status': 'fail',
-                'message': 'Provide a valid auth token.'
-            }
-            return make_response(jsonify(response_object)), 401
-
-
 class LogoutAPI(MethodView):
     """
     Logout Resource
@@ -225,7 +178,6 @@ class LogoutAPI(MethodView):
 registration_image_view = RegisterImageAPI.as_view('register_image_api')
 login_image_view = LoginImageAPI.as_view('login_image_api')
 login_view = LoginAPI.as_view('login_api')
-user_view = UserAPI.as_view('user_api')
 logout_view = LogoutAPI.as_view('logout_api')
 
 # add Rules for API Endpoints
@@ -243,11 +195,6 @@ auth.add_url_rule(
     '/auth/login/basic',
     view_func=login_view,
     methods=['POST']
-)
-auth.add_url_rule(
-    '/auth/status',
-    view_func=user_view,
-    methods=['GET']
 )
 auth.add_url_rule(
     '/auth/logout',

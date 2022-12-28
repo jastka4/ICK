@@ -1,1 +1,1 @@
-from .auth.models import User, BlacklistToken
+from .auth.models import CUBE, User, BlacklistToken

@@ -24,6 +24,7 @@ class User(db.Model):
     face_embeddings_low = db.Column(CUBE, unique=True, nullable=False)
     face_embeddings_high = db.Column(CUBE, unique=True, nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
+    settings = db.relationship('Settings', backref='user', lazy=True, uselist=False)
 
     def __init__(self, email, password, image, admin=False):
         self.email = email
