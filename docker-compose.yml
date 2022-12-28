@@ -5,6 +5,7 @@ services:
     container_name: face_recognition
     environment:
       - APP_SETTINGS=app.config.DevelopmentConfig
+      - SQLALCHEMY_DATABASE_URI=postgresql://admin:admin@postgres:5432/face_recognition
     ports:
       - "5050:5000"
     volumes:
