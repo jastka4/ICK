@@ -3,6 +3,7 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 local_base = 'postgresql://admin:admin@localhost:5432/'
 database_name = 'face_recognition'
+car_model_api_url = 'http://ick-piechbart.pitunnel.com/api'
 
 
 class BaseConfig:
@@ -11,6 +12,8 @@ class BaseConfig:
     DEBUG = False
     BCRYPT_LOG_ROUNDS = 13
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    CAR_MODEL_API_ENABLED = os.getenv('CAR_MODEL_API_ENABLED', False)
+    CAR_MODEL_API_URL = os.getenv('CAR_MODEL_API_URL', car_model_api_url)
 
 
 class DevelopmentConfig(BaseConfig):

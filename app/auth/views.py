@@ -2,7 +2,7 @@ from flask import Blueprint, request, make_response, jsonify
 from flask.views import MethodView
 
 from ..extensions import bcrypt, db
-from ..models import User, BlacklistToken
+from ..models import User, BlacklistToken, Settings
 
 auth = Blueprint('auth', __name__)
 
@@ -29,6 +29,10 @@ class RegisterImageAPI(MethodView):
                 db.session.add(user)
                 db.session.commit()
 
+                settings = Settings(user_id=user.id)
+                db.session.add(settings)
+                db.session.commit()
+
                 # generate the auth token
                 auth_token = user.encode_auth_token(user.id)
                 response_object = {
@@ -40,7 +44,7 @@ class RegisterImageAPI(MethodView):
             except Exception as e:
                 response_object = {
                     'status': 'fail',
-                    'message': 'Some error occurred. Please try again.'
+                    'message': 'Some error occurred: ' + str(e)
                 }
                 return make_response(jsonify(response_object)), 401
         else:
