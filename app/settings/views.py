@@ -78,7 +78,7 @@ class SettingsAPI(MethodView):
                         }
                     )
 
-                    if not api_response.ok or api_response.json().status != 'ok':
+                    if not api_response.ok or api_response.json().get('status') != 'ok':
                         response_object = {
                             'status': 'fail',
                             'message': 'Some error with the model occurred: ' + api_response
